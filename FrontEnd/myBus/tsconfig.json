@@ -2,6 +2,9 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "moduleResolution": "node",  // Ajoute cette ligne
+    "esModuleInterop": true,      // Ajoute cette ligne
+    "allowSyntheticDefaultImports": true,  // Ajoute cette ligne
     "paths": {
       "@/*": [
         "./*"
