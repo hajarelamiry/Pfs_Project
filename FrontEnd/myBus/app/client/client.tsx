@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Dashboard from "../client/Dashboard";
-import BusDetail from "../client/BusDetail";
-import MapScreen from "../client/MapView";
+import Dashboard from "./Dashboard";
+import BusDetail from "./BusDetail";
+import MapScreen from "./MapView";
 
 const Tab = createBottomTabNavigator();
 

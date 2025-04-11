@@ -66,7 +66,7 @@ export default function BusesList() {
       batteryLevel: 45,
     },
   ]
-
+  
   const renderFeatureIcon = (feature: "wifi" | "charging" | "security") => {
     switch (feature) {
       case "wifi":
