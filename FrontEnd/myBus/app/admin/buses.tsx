@@ -3,10 +3,15 @@
 import { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
 import { Bus, Search, Filter, Plus, MapPin, Battery, Wifi, Shield, MoreVertical } from "lucide-react-native"
+import {useRouter} from "expo-router";
 
 export default function BusesList() {
   const [searchQuery, setSearchQuery] = useState("")
- 
+
+  const router = useRouter();
+
+
+  const navigateToAdd = () => router.push('../Bus/Add');
 
   // Mock data for buses
   const buses = [
@@ -81,11 +86,6 @@ export default function BusesList() {
   }
   
 
-  const getBatteryColor = (level:number) => {
-    if (level > 70) return "#22C55E"
-    if (level > 30) return "#F59E0B"
-    return "#DC2626"
-  }
 
   const getStatusColor = (status: "Active" | "Maintenance" | "Inactive") => {
     switch (status) {
@@ -126,7 +126,7 @@ export default function BusesList() {
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={navigateToAdd}>
             <Plus stroke="#FFFFFF" size={18} />
             <Text style={styles.addButtonText}>Add Bus</Text>
           </TouchableOpacity>
@@ -152,15 +152,7 @@ export default function BusesList() {
               <Text style={styles.busName}>{bus.name}</Text>
               <Text style={styles.busRoute}>{bus.route}</Text>
 
-              <View style={styles.busInfoRow}>
-                <View style={styles.busInfoItem}>
-                  <MapPin size={16} stroke="#64748B" />
-                  <Text style={styles.busInfoText}>{bus.lastLocation}</Text>
-                </View>
-                <View style={styles.busInfoItem}>
-                  <Text style={styles.busInfoText}>Driver: {bus.driver}</Text>
-                </View>
-              </View>
+
 
               <View style={styles.divider} />
 
@@ -170,21 +162,7 @@ export default function BusesList() {
                   <Text style={styles.busDetailValue}>{bus.capacity} seats</Text>
                 </View>
 
-                <View style={styles.busDetailItem}>
-                  <Text style={styles.busDetailLabel}>Battery</Text>
-                  <View style={styles.batteryContainer}>
-                    <View
-                      style={[
-                        styles.batteryLevel,
-                        {
-                          width: `${bus.batteryLevel}%`,
-                          backgroundColor: getBatteryColor(bus.batteryLevel),
-                        },
-                      ]}
-                    />
-                    <Text style={styles.batteryText}>{bus.batteryLevel}%</Text>
-                  </View>
-                </View>
+
               </View>
 
               <View style={styles.busFooter}>
@@ -367,27 +345,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1E293B",
   },
-  batteryContainer: {
-    height: 16,
-    backgroundColor: "#F1F5F9",
-    borderRadius: 8,
-    overflow: "hidden",
-    position: "relative",
-  },
-  batteryLevel: {
-    height: "100%",
-    position: "absolute",
-    left: 0,
-    top: 0,
-  },
-  batteryText: {
-    position: "absolute",
-    right: 6,
-    top: 0,
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#1E293B",
-  },
+
   busFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
