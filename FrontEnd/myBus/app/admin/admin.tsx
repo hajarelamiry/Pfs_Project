@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { BarChart2, Users, Bus, Home, TrendingUp, AlertCircle, Clock } from 'lucide-react-native';
+import { Users, Bus, Home, TrendingUp, AlertCircle, Clock } from 'lucide-react-native';
 import  QuickAccess  from '../../components/QuickAcces'
 
 export default function Dashboard() {
