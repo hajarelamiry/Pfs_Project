@@ -72,17 +72,18 @@ const MapScreen = () => {
         // Fetch bus locations
         let locations: BusLocation[] = []
         if (bus) {
-          
+          // If a specific bus is selected, only fetch its location
           const busLocation = await fetchBusLocations([bus.id])
           locations = busLocation
         } else if (buses) {
           // If multiple buses are provided, fetch all their locations
           const busIds = buses.map((b) => b.id)
           locations = await fetchBusLocations(busIds)
-        } 
+        }
 
         setBusLocations(locations)
 
+        // If we have locations and no user location yet, center the map on the first bus
         if (locations.length > 0 && !userLocation) {
           setRegion({
             latitude: locations[0].latitude,
@@ -98,14 +99,14 @@ const MapScreen = () => {
       }
     }
 
-  
+    // Load bus locations initially
     loadBusLocations()
 
-   
+    // Set up interval to update bus locations
     locationUpdateInterval.current = setInterval(loadBusLocations, 10000) // Update every 10 seconds
 
     return () => {
-    
+      // Clean up interval on component unmount
       if (locationUpdateInterval.current) {
         clearInterval(locationUpdateInterval.current)
       }
@@ -115,10 +116,11 @@ const MapScreen = () => {
   const handleBusSelect = (selectedBus: Bus) => {
     setSelectedBus(selectedBus)
 
+    // Find the bus location
     const busLocation = busLocations.find((loc) => loc.busId === selectedBus.id)
 
     if (busLocation) {
-    
+      // Animate to the bus location
       mapRef.current?.animateToRegion({
         latitude: busLocation.latitude,
         longitude: busLocation.longitude,
@@ -163,15 +165,15 @@ const MapScreen = () => {
             showsUserLocation
             showsMyLocationButton={false}
           >
-           
+            {/* Render bus markers */}
             {busLocations.map((location) => (
               <BusMarker key={location.busId} location={location} isSelected={selectedBus?.id === location.busId} />
             ))}
 
-         
+            {/* Render station markers if a bus is selected */}
             {selectedBus && stations.map((station) => <StationMarker key={station.id} station={station} />)}
 
-     
+            {/* Render route line if a bus is selected */}
             {selectedBus && stations.length > 1 && (
               <Polyline
                 coordinates={stations.map((station) => ({
@@ -185,14 +187,14 @@ const MapScreen = () => {
             )}
           </MapView>
 
-        
+          {/* Map controls */}
           <View style={styles.mapControls}>
             <TouchableOpacity style={styles.controlButton} onPress={handleCenterOnUser}>
               <Ionicons name="locate" size={24} color="#0066CC" />
             </TouchableOpacity>
           </View>
 
-
+          {/* Bus selector if multiple buses */}
           {buses && buses.length > 0 && (
             <View style={styles.busSelector}>
               <Text style={styles.busSelectorTitle}>Sélectionner un bus</Text>

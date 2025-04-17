@@ -1,0 +1,55 @@
+package pfs.project.myBus.Entity;
+
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+public class BusType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String firstStation;
+    private String lastStation;
+
+    @ManyToMany
+    @JoinTable(
+            name = "bus_station",
+            joinColumns = @JoinColumn(name = "bus_id"),
+            inverseJoinColumns = @JoinColumn(name = "station_id")
+    )
+    private List<Station> stations;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFirstStation() {
+        return firstStation;
+    }
+
+    public String getLastStation() {
+        return lastStation;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setFirstStation(String firstStation) {
+        this.firstStation = firstStation;
+    }
+
+    public void setLastStation(String lastStation) {
+        this.lastStation = lastStation;
+    }
+}
