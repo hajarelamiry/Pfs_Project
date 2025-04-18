@@ -50,21 +50,21 @@ export default function BusesList() {
         },
       })
       if (!response.ok) {
-        throw new Error(`Erreur HTTP! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
       const data = await response.json()
       setBuses(data)
     } catch (err) {
-      console.error("Erreur de recuperation des bus", err)
+      console.error("Error fetching buses", err)
     } finally {
       setLoading(false)
     }
   }
 
-  const navigateToAdd = () => router.push("../Bus/Add")
+  const navigateToAdd = () => router.push("/admin/Bus/Add")
 
   const navigateToEdit = (busId: number) => {
-    router.push(`../Bus/Edit/${busId}`)
+    router.push(`/admin/Bus/Edit/${busId}`)
   }
 
   const deleteBus = async (busId: number) => {
@@ -79,23 +79,23 @@ export default function BusesList() {
       })
 
       if (!response.ok) {
-        throw new Error(`Erreur HTTP! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       fetchBuses()
-      Alert.alert("Succès", "Bus supprimé avec succès")
+      Alert.alert("Success", "Bus deleted successfully")
     } catch (err) {
-      console.error("Erreur lors de la suppression du bus", err)
-      Alert.alert("Erreur", "Impossible de supprimer le bus")
+      console.error("Error deleting bus", err)
+      Alert.alert("Error", "Failed to delete the bus")
     } finally {
       setLoading(false)
     }
   }
 
   const confirmDelete = (busId: number, busName: string) => {
-    Alert.alert("Confirmer la suppression", `Êtes-vous sûr de vouloir supprimer le bus ${busName} ?`, [
-      { text: "Annuler", style: "cancel" },
-      { text: "Supprimer", onPress: () => deleteBus(busId), style: "destructive" },
+    Alert.alert("Confirm Deletion", `Are you sure you want to delete the bus ${busName}?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", onPress: () => deleteBus(busId), style: "destructive" },
     ])
   }
 
@@ -200,7 +200,10 @@ export default function BusesList() {
                         <Edit size={16} stroke="#FFFFFF" />
                       </TouchableOpacity>
 
-                      <TouchableOpacity style={styles.deleteButton} onPress={() => confirmDelete(bus.id, bus.busType.name)}>
+                      <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => confirmDelete(bus.id, bus.busType.name)}
+                      >
                         <Trash2 size={16} stroke="#FFFFFF" />
                       </TouchableOpacity>
                     </View>
@@ -212,6 +215,7 @@ export default function BusesList() {
       </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {

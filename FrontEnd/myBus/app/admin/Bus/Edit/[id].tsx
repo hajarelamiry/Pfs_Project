@@ -1,16 +1,17 @@
+
 "use client"
 
-import { useState, useEffect, SetStateAction} from "react"
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Alert} from "react-native"
-import {ArrowLeft, Bus, ChevronDown, Battery, Wifi, Shield, Check} from "lucide-react-native"
-import {AxiosError} from "axios";
-import {useRouter} from "expo-router";
+import { useEffect, useState } from "react"
+import { useLocalSearchParams, useRouter } from "expo-router"
+import {View, Text, TextInput, Button, Alert, ScrollView, TouchableOpacity, Switch, StyleSheet} from "react-native"
+import axios from "axios"
+import {ArrowLeft, Battery, Bus, Check, ChevronDown, Shield, Wifi} from "lucide-react-native";
 
 type BusType = {
     id: string
     name: string
 }
-interface Status {
+interface Statut {
     id: number;
     label: string;
 }
@@ -21,11 +22,10 @@ type Driver = {
     lastName: string
 }
 
-export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
-
+export default function EditBus() {
     const router = useRouter();
-
     const navigateToBuses = () => router.push('../admin/buses');
+
     const [formData, setFormData] = useState({
         busTypeId: "",
         driverId: "",
@@ -33,7 +33,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         wifi: false,
         charging: false,
         security: false,
-        status:""
+        statut:""
     })
 
     const [busTypes, setBusTypes] = useState<BusType[]>([])
@@ -43,12 +43,42 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
     const [selectedBusType, setSelectedBusType] = useState<BusType | null>(null)
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-    const statuses: Status[] = [
+    const [selectedStatus, setSelectedStatus] = useState<Statut | null>(null);
+
+    const statuses: Statut[] = [
         {id: 1, label: 'In service'},
         {id: 2, label: 'Out of service'},
         {id: 3, label: 'Under maintenance'}
     ];
+
+    const selectBusType = (busType: BusType) => {
+        setSelectedBusType(busType)
+        setFormData((prev) => ({...prev, busTypeId: busType.id}))
+        setShowBusTypeDropdown(false)
+    }
+
+    const selectDriver = (driver: Driver) => {
+        setSelectedDriver(driver)
+        setFormData((prev) => ({...prev, driverId: driver.id}))
+        setShowDriverDropdown(false)
+    }
+
+    const selectStatus = (statut: Statut) => {
+        console.log("Selected status:", statut);
+        setSelectedStatus(statut);
+        setFormData((prev) => ({
+            ...prev,
+            statut: statut.label,
+        }));
+        setShowStatusDropdown(false);
+    };
+
+    const { id } = useLocalSearchParams()
+    const [bus, setBus] = useState<any>(null)
+
+    useEffect(() => {
+        fetchBusDetails()
+    }, [])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,11 +98,13 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                         "Authorization": "Basic " + btoa("admin:h200317")
                     },
                 });
+
                 const driverText = await driverRes.text();
                 const busTypeText = await busTypeRes.text();
 
                 console.log("Drivers response:", driverText);
                 console.log("Bus Types response:", busTypeText);
+
                 if (driverText) {
                     const driversData = JSON.parse(driverText);
                     setDrivers(driversData);
@@ -95,92 +127,73 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         fetchData()
     }, [])
 
-    const selectBusType = (busType: BusType) => {
-        setSelectedBusType(busType)
-        setFormData((prev) => ({...prev, busTypeId: busType.id}))
-        setShowBusTypeDropdown(false)
-    }
-
-    const selectDriver = (driver: Driver) => {
-        setSelectedDriver(driver)
-        setFormData((prev) => ({...prev, driverId: driver.id}))
-        setShowDriverDropdown(false)
-    }
-
-    const selectStatus = (status: Status) => {
-        console.log("Statut sélectionné:", status);
-        setSelectedStatus(status);
-        setFormData((prev) => ({
-            ...prev,
-            status: status.label,
-        }));
-        setShowStatusDropdown(false);
-    };
-
-    const handleSubmit = async (message?: any) => {
-        if (!formData.busTypeId || !formData.driverId || !formData.capacity) {
-            alert("Please fill out all required fields.");
-            return;
+    const fetchBusDetails = async () => {
+        try {
+            const response = await axios.get(`http://100.89.162.136:8003/api/buses/getBus/${id}`, {
+                headers: {
+                    Authorization: "Basic " + btoa("admin:h200317"),
+                },
+            })
+            setBus(response.data)
+            setFormData({
+                busTypeId: response.data.busType?.id || "",
+                driverId: response.data.driver?.id || "",
+                capacity: response.data.capacity?.toString() || "",
+                wifi: response.data.wifi || false,
+                charging: response.data.charging || false,
+                security: response.data.security || false,
+                statut: response.data.statut || "",
+            });
+        } catch (error) {
+            Alert.alert("Error", "Unable to load bus")
+            console.error(error)
         }
+    }
 
-        const payload = {
-                capacity: parseInt(formData.capacity),
-               status: formData.status || 'Not defined',
-                charging: formData.charging,
-                security: formData.security,
-                wifi: formData.wifi,
+    useEffect(() => {
+        if (bus) {
+            setFormData({
+                busTypeId: bus.busType?.id || "",
+                driverId: bus.driver?.id || "",
+                capacity: bus.capacity?.toString() || "",
+                wifi: bus.wifi || false,
+                charging: bus.charging || false,
+                security: bus.security || false,
+                statut: bus.status || "",
+            });
+        }
+    }, [bus]);
+
+    const handleUpdate = async () => {
+        try {
+            await axios.put(`http://100.89.162.136:8003/api/buses/update/${id}`, {
                 busTypeId: formData.busTypeId,
                 driverId: formData.driverId,
-        };
-        console.log(payload);
-
-        try {
-            const response = await fetch("http://100.89.162.136:8003/api/buses/add", {
-                method: "POST",
+                capacity: parseInt(formData.capacity),
+                wifi: formData.wifi,
+                charging: formData.charging,
+                security: formData.security,
+                statut: formData.statut,
+            }, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Basic " + btoa("admin:h200317")
+                    Authorization: "Basic " + btoa("admin:h200317"),
                 },
-                body: JSON.stringify(payload),
-            });
+            })
 
-            if (response.ok) {
-                const savedBus = await response.json();
-                console.log("Bus registered successfully:", savedBus);
-                setFormData({
-                    capacity: "",
-                    charging: false,
-                    security: false,
-                    status:"",
-                    wifi: false,
-                    busTypeId: "",
-                    driverId: "",
-
-                });
-                setSelectedStatus(null);
-                if (onCancel) onCancel();
-            } else {
-                const error = await response.text();
-                console.error("Error during registration:", error);
-                alert("An error occurred while registering the bus.");
-            }
-        } catch (err) {
-            const error = err as AxiosError;
-
-            if (error.response?.data && typeof error.response.data === 'object') {
-                const data = error.response.data as { error?: string };
-                Alert.alert("Error", data.error || "Unexpected error.");
-            } else {
-                Alert.alert("Error", "An error occurred while adding the bus.");
-            }
+            router.push("/admin/buses")
+        } catch (error) {
+            alert("Unable to update bus")
+            console.error(error)
         }
-    };
+    }
+
+    if (!bus) return <Text>Loading...</Text>
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Add Bus</Text>
-                <Text style={styles.headerSubtitle}>Enter bus details</Text>
+                <Text style={styles.headerTitle}>Update Bus</Text>
             </View>
 
             <ScrollView style={styles.formContainer}>
@@ -192,7 +205,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                             <View style={styles.dropdownSelection}>
                                 <Bus stroke="#1E40AF" size={18} style={styles.dropdownIcon} />
                                 <Text style={styles.dropdownText}>
-                                    {selectedBusType ? selectedBusType.name : "Select a bus type"}
+                                    {selectedBusType ? selectedBusType.name :`${bus.busType.name}` }
                                 </Text>
                             </View>
                             <ChevronDown stroke="#64748B" size={18} />
@@ -214,10 +227,10 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                         <TouchableOpacity style={styles.dropdown} onPress={() => setShowDriverDropdown(!showDriverDropdown)}>
                             <View style={styles.dropdownSelection}>
                                 <Text style={styles.dropdownIcon}>👤</Text>
-                                <Text style={styles.dropdownText}>
+                                <Text style={styles.dropdownText}  >
                                     {selectedDriver
                                         ? `${selectedDriver.firstName} ${selectedDriver.lastName}`
-                                        : "Select a driver"}
+                                        : `${bus.driver.firstName} ${bus.driver.lastName}`}
                                 </Text>
                             </View>
                             <ChevronDown stroke="#64748B" size={18} />
@@ -259,8 +272,8 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                         <TouchableOpacity style={styles.dropdown} onPress={() => setShowStatusDropdown(!showStatusDropdown)}>
                             <View style={styles.dropdownSelection}>
                                 <Text style={styles.dropdownIcon}>🚍</Text>
-                                <Text style={styles.dropdownText}>
-                                    {selectedStatus ? selectedStatus.label : "Select a status"}
+                                <Text style={styles.dropdownText} >
+                                    {selectedStatus ? selectedStatus.label : `${bus.statut}`}
                                 </Text>
                             </View>
                             <ChevronDown stroke="#64748B" size={18} />
@@ -332,9 +345,9 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                <TouchableOpacity style={styles.submitButton} onPress={handleUpdate}>
                     <Check stroke="#FFFFFF" size={18} />
-                    <Text style={styles.submitButtonText}>Save</Text>
+                    <Text style={styles.submitButtonText}>Update</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -408,7 +421,7 @@ const styles = StyleSheet.create({
     },
     dropdownText: {
         fontSize: 14,
-        color: "#64748B",
+        color: "#000000",
     },
     dropdownList: {
         backgroundColor: "#FFFFFF",
