@@ -60,7 +60,6 @@ export default function BusesList() {
       setLoading(false)
     }
   }
-
   const navigateToAdd = () => router.push("/admin/Bus/Add")
 
   const navigateToEdit = (busId: number) => {
@@ -98,7 +97,6 @@ export default function BusesList() {
       { text: "Delete", onPress: () => deleteBus(busId), style: "destructive" },
     ])
   }
-
   const renderFeatureIcon = (feature: "wifi" | "charging" | "security") => {
     switch (feature) {
       case "wifi":
