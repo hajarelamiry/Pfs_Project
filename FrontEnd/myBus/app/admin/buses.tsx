@@ -1,72 +1,102 @@
 "use client"
 
-import { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
-import { Bus, Search, Filter, Plus, MapPin, Battery, Wifi, Shield, MoreVertical } from "lucide-react-native"
+import { useEffect, useState } from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native"
+import { Bus as BusIcon, Search, Filter, Plus, Battery, Wifi, Shield, Edit, Trash2 } from "lucide-react-native"
+import { useRouter } from "expo-router"
+
+type Bus = {
+  id: number
+  name?: string
+  capacity: number
+  statut: string
+  wifi: boolean
+  charging: boolean
+  security: boolean
+  busType: {
+    id: number
+    name: string
+    firstStation: string
+    lastStation: string
+  }
+  driver: {
+    id: number
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+  }
+}
 
 export default function BusesList() {
   const [searchQuery, setSearchQuery] = useState("")
- 
+  const [loading, setLoading] = useState(true)
 
-  // Mock data for buses
-  const buses = [
-    {
-      id: "B-001",
-      name: "City Express",
-      route: "Downtown - Airport",
-      status: "Active",
-      driver: "Michael Johnson",
-      capacity: 42,
-      features: ["wifi", "charging", "security"],
-      lastLocation: "Central Station",
-      batteryLevel: 78,
-    },
-    {
-      id: "B-002",
-      name: "Metro Shuttle",
-      route: "North End - South Terminal",
-      status: "Active",
-      driver: "Sarah Williams",
-      capacity: 36,
-      features: ["wifi", "charging"],
-      lastLocation: "North Mall",
-      batteryLevel: 65,
-    },
-    {
-      id: "B-003",
-      name: "Express Line",
-      route: "East Side - West End",
-      status: "Maintenance",
-      driver: "Robert Davis",
-      capacity: 40,
-      features: ["wifi", "security"],
-      lastLocation: "Service Center",
-      batteryLevel: 22,
-    },
-    {
-      id: "B-004",
-      name: "Commuter Plus",
-      route: "Suburbs - Business District",
-      status: "Active",
-      driver: "Emily Brown",
-      capacity: 38,
-      features: ["charging", "security"],
-      lastLocation: "Business Park",
-      batteryLevel: 91,
-    },
-    {
-      id: "B-005",
-      name: "Night Owl",
-      route: "Downtown Loop",
-      status: "Inactive",
-      driver: "Unassigned",
-      capacity: 30,
-      features: ["wifi", "charging", "security"],
-      lastLocation: "Bus Depot",
-      batteryLevel: 45,
-    },
-  ]
-  
+  const router = useRouter()
+  const [buses, setBuses] = useState<Bus[]>([])
+
+  useEffect(() => {
+    fetchBuses()
+  }, [])
+
+  const fetchBuses = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("http://100.89.162.136:8003/api/buses/allBuses", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Basic " + btoa("admin:h200317"),
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      setBuses(data)
+    } catch (err) {
+      console.error("Error fetching buses", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+  const navigateToAdd = () => router.push("/admin/Bus/Add")
+
+  const navigateToEdit = (busId: number) => {
+    router.push(`/admin/Bus/Edit/${busId}`)
+  }
+
+  const deleteBus = async (busId: number) => {
+    try {
+      setLoading(true)
+      const response = await fetch(`http://100.89.161.147:8003/api/buses/bus/${busId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Basic " + btoa("admin:h200317"),
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      fetchBuses()
+      Alert.alert("Success", "Bus deleted successfully")
+    } catch (err) {
+      console.error("Error deleting bus", err)
+      Alert.alert("Error", "Failed to delete the bus")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const confirmDelete = (busId: number, busName: string) => {
+    Alert.alert("Confirm Deletion", `Are you sure you want to delete the bus ${busName}?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", onPress: () => deleteBus(busId), style: "destructive" },
+    ])
+  }
   const renderFeatureIcon = (feature: "wifi" | "charging" | "security") => {
     switch (feature) {
       case "wifi":
@@ -79,134 +109,111 @@ export default function BusesList() {
         return null
     }
   }
-  
 
-  const getBatteryColor = (level:number) => {
-    if (level > 70) return "#22C55E"
-    if (level > 30) return "#F59E0B"
-    return "#DC2626"
-  }
-
-  const getStatusColor = (status: "Active" | "Maintenance" | "Inactive") => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active":
+      case "In service":
         return { bg: "#EFF6FF", text: "#1E40AF" }
-      case "Maintenance":
+      case "Under maintenance":
         return { bg: "#FEF3C7", text: "#D97706" }
-      case "Inactive":
+      case "Out of service":
         return { bg: "#FEF2F2", text: "#DC2626" }
       default:
         return { bg: "#F3F4F6", text: "#6B7280" }
     }
   }
-  
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Bus Fleet</Text>
-        <Text style={styles.headerSubtitle}>Manage your bus fleet</Text>
-      </View>
-
-      <View style={styles.actionsContainer}>
-        <View style={styles.searchContainer}>
-          <Search stroke="#64748B" size={20} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search buses..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#64748B"
-          />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Bus Fleet</Text>
+          <Text style={styles.headerSubtitle}>Manage your bus fleet</Text>
         </View>
 
-        <View style={styles.buttonGroup}>
-          <TouchableOpacity style={styles.filterButton}>
-            <Filter stroke="#1E40AF" size={18} />
-            <Text style={styles.filterButtonText}>Filter</Text>
-          </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          <View style={styles.searchContainer}>
+            <Search stroke="#64748B" size={20} style={styles.searchIcon} />
+            <TextInput
+                style={styles.searchInput}
+                placeholder="Search buses..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholderTextColor="#64748B"
+            />
+          </View>
 
-          <TouchableOpacity style={styles.addButton}>
-            <Plus stroke="#FFFFFF" size={18} />
-            <Text style={styles.addButtonText}>Add Bus</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity style={styles.filterButton}>
+              <Filter stroke="#1E40AF" size={18} />
+              <Text style={styles.filterButtonText}>Filter</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.addButton} onPress={navigateToAdd}>
+              <Plus stroke="#FFFFFF" size={18} />
+              <Text style={styles.addButtonText}>Add Bus</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <ScrollView style={styles.busesContainer}>
-        {buses.map((bus) => {
-          const statusStyle = getStatusColor(bus.status as "Active" | "Maintenance" | "Inactive")
+        <ScrollView style={styles.busesContainer}>
+          {buses.map((bus) => {
+            return (
+                <View key={bus.id} style={styles.busCard}>
+                  <View style={styles.busCardHeader}>
+                    <View style={styles.busIdContainer}>
+                      <BusIcon stroke="#1E40AF" size={18} />
+                      <Text style={styles.busId}>{bus.busType.name}</Text>
+                    </View>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(bus.statut).bg }]}>
+                      <Text style={[styles.statusText, { color: "#0369A1" }]}>{bus.statut}</Text>
+                    </View>
+                  </View>
 
-          return (
-            <View key={bus.id} style={styles.busCard}>
-              <View style={styles.busCardHeader}>
-                <View style={styles.busIdContainer}>
-                  <Bus stroke="#1E40AF" size={18} />
-                  <Text style={styles.busId}>{bus.id}</Text>
-                </View>
-                <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-                  <Text style={[styles.statusText, { color: statusStyle.text }]}>{bus.status}</Text>
-                </View>
-              </View>
+                  <Text style={styles.busName}>
+                    🚍 {bus.busType.firstStation} → {bus.busType.lastStation}
+                  </Text>
 
-              <Text style={styles.busName}>{bus.name}</Text>
-              <Text style={styles.busRoute}>{bus.route}</Text>
+                  <Text style={styles.busRoute}>
+                    👤 {bus.driver.firstName} {bus.driver.lastName}
+                  </Text>
 
-              <View style={styles.busInfoRow}>
-                <View style={styles.busInfoItem}>
-                  <MapPin size={16} stroke="#64748B" />
-                  <Text style={styles.busInfoText}>{bus.lastLocation}</Text>
-                </View>
-                <View style={styles.busInfoItem}>
-                  <Text style={styles.busInfoText}>Driver: {bus.driver}</Text>
-                </View>
-              </View>
+                  <View style={styles.divider} />
 
-              <View style={styles.divider} />
+                  <View style={styles.busDetailsRow}>
+                    <View style={styles.busDetailItem}>
+                      <Text style={styles.busDetailLabel}>Capacity</Text>
+                      <Text style={styles.busDetailValue}>{bus.capacity} seats</Text>
+                    </View>
+                  </View>
 
-              <View style={styles.busDetailsRow}>
-                <View style={styles.busDetailItem}>
-                  <Text style={styles.busDetailLabel}>Capacity</Text>
-                  <Text style={styles.busDetailValue}>{bus.capacity} seats</Text>
-                </View>
+                  <View style={styles.busFooter}>
+                    <View style={styles.featureContainer}>
+                      {bus.wifi && <View style={styles.featureItem}>{renderFeatureIcon("wifi")}</View>}
+                      {bus.charging && <View style={styles.featureItem}>{renderFeatureIcon("charging")}</View>}
+                      {bus.security && <View style={styles.featureItem}>{renderFeatureIcon("security")}</View>}
+                    </View>
 
-                <View style={styles.busDetailItem}>
-                  <Text style={styles.busDetailLabel}>Battery</Text>
-                  <View style={styles.batteryContainer}>
-                    <View
-                      style={[
-                        styles.batteryLevel,
-                        {
-                          width: `${bus.batteryLevel}%`,
-                          backgroundColor: getBatteryColor(bus.batteryLevel),
-                        },
-                      ]}
-                    />
-                    <Text style={styles.batteryText}>{bus.batteryLevel}%</Text>
+                    <View style={styles.actionButtons}>
+                      <TouchableOpacity style={styles.editButton} onPress={() => navigateToEdit(bus.id)}>
+                        <Edit size={16} stroke="#FFFFFF" />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => confirmDelete(bus.id, bus.busType.name)}
+                      >
+                        <Trash2 size={16} stroke="#FFFFFF" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
-
-              <View style={styles.busFooter}>
-                <View style={styles.featureContainer}>
-                  {bus.features.map((feature, index) => (
-                    <View key={index} style={styles.featureItem}>
-                      {renderFeatureIcon(feature as "wifi" | "charging" | "security")}
-                    </View>
-                  ))}
-                </View>
-
-                <TouchableOpacity style={styles.moreButton}>
-                  <MoreVertical size={20} stroke="#64748B" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )
-        })}
-      </ScrollView>
-    </View>
+            )
+          })}
+        </ScrollView>
+      </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -367,31 +374,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1E293B",
   },
-  batteryContainer: {
-    height: 16,
-    backgroundColor: "#F1F5F9",
-    borderRadius: 8,
-    overflow: "hidden",
-    position: "relative",
-  },
-  batteryLevel: {
-    height: "100%",
-    position: "absolute",
-    left: 0,
-    top: 0,
-  },
-  batteryText: {
-    position: "absolute",
-    right: 6,
-    top: 0,
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#1E293B",
-  },
   busFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 8,
   },
   featureContainer: {
     flexDirection: "row",
@@ -399,8 +386,36 @@ const styles = StyleSheet.create({
   featureItem: {
     marginRight: 12,
   },
-  moreButton: {
-    padding: 4,
+  actionButtons: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  editButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1E40AF",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  editButtonText: {
+    color: "#FFFFFF",
+    marginLeft: 4,
+    fontWeight: "500",
+    fontSize: 12,
+  },
+  deleteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#DC2626",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  deleteButtonText: {
+    color: "#FFFFFF",
+    marginLeft: 4,
+    fontWeight: "500",
+    fontSize: 12,
   },
 })
-
