@@ -1,4 +1,4 @@
-package pfs.project.myBus.Controller.Admin;
+package pfs.project.myBus.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

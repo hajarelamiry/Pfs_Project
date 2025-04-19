@@ -9,6 +9,7 @@ public class Bus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int capacity;
+    private String name ;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "bus_type_id", nullable = false)
