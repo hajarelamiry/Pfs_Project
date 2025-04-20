@@ -17,31 +17,30 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .authorizeHttpRequests(auth -> auth
-                            .anyRequest().authenticated()
-                    )
-                    .httpBasic(Customizer.withDefaults()) // Utiliser Customizer au lieu de .httpBasic()
-                    .csrf(csrf -> csrf.disable()); // Désactiver CSRF avec lambda
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**").permitAll() // Autoriser WebSocket sans auth
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults());
 
-            return http.build();
-        }
+        return http.build();
+    }
 
-        @Bean
-        public UserDetailsService userDetailsService() {
-            UserDetails user = User.withUsername("admin")
-                    .password(passwordEncoder().encode("h200317"))
-                    .roles("USER")
-                    .build();
-            return new InMemoryUserDetailsManager(user);
-        }
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails user = User.withUsername("admin")
+                .password(passwordEncoder().encode("h200317"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(user);
+    }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
-
-
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
