@@ -1,5 +1,12 @@
 // Définition des couleurs de l'application
 export const Colors = {
+  auth:{
+    white: '#FFFFFF',
+    primary: '#45484A',
+    secondary: '#AEB5BB',
+    gray: '#D9D9D9',
+  
+  },
   // Couleurs principales
   primary: {
     main: "#1E40AF",
