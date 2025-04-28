@@ -51,7 +51,7 @@ const Login = () => {
       });
       console.log('Token:', response.data.token);
       Alert.alert('Login Successful');
-      router.push('/Win'); // Navigate to the Win page
+      router.push('/admin/users'); // Navigate to the Win page
     } catch (error) {
       console.error(error);
       setErrorMessage("Login Failed. Please check your credentials.");

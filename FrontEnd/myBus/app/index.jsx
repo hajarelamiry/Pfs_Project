@@ -2,10 +2,23 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'rea
 import React from 'react';
 import { Colors } from '../constants/Colors';
 import { useRouter } from "expo-router";
+import { useFonts } from 'expo-font';
 
 
 const Home = () => {
+    const [fontsLoaded] = useFonts({
+      Bold: require('../assets/fonts/Poppins-Bold.ttf'),
+      SemiBold: require('../assets/fonts/Poppins-SemiBold.ttf'),
+      Regular: require('../assets/fonts/Poppins-Regular.ttf'),
+      Light: require('../assets/fonts/Poppins-Light.ttf'),
+      Medium: require('../assets/fonts/Poppins-Medium.ttf'),
+    });
+
   const router = useRouter();
+
+    if (!fontsLoaded) {
+      return <Text>Loading Fonts...</Text>;
+    }
 
   const handleLogin = () => {
     router.push('/Login');
@@ -19,7 +32,7 @@ const Home = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-        <Image source={require('../assets/images/pp.jpg')} style={styles.l} />
+        <Image source={require('../assets/images/person.webp')} style={styles.l} />
         <Text style={styles.title}>Move Better</Text>
         <Text style={styles.subtitle}>Know your bus location and plan your journey smarter</Text>
         <View style={styles.buttonContainer}>
@@ -27,7 +40,7 @@ const Home = () => {
             style={[styles.loginButton, { backgroundColor: Colors.auth.primary }]}
             onPress={handleLogin}
           >
-            <Text style={styles.loginText}>Login </Text>
+            <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.loginButton} onPress={handleSingup}>
@@ -58,6 +71,7 @@ const styles = StyleSheet.create({
     height: 250,
     width: 250,
     marginVertical: 20,
+    marginBottom: 0,
   },
   title: {
     fontSize: 40,
@@ -65,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     textAlign: "center",
     color: Colors.auth.primary,
-    marginTop: 1,
+    marginTop: 0.5,
   },
   subtitle: {
     paddingHorizontal:30,

@@ -3,7 +3,6 @@ import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors } from '../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
-import { fonts } from '../constants/fonts';
 
 
 const Signuproot = () => {
@@ -58,6 +57,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: "center",
         alignItems: "center",
+        marginLeft: 0 ,
       },
     logo: { height:40,width:140 , marginVertical: 20},
     l: { height:250,width:231 , marginVertical: 10},
