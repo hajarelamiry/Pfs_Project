@@ -1,9 +1,12 @@
 package pfs.project.myBus.Dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,5 +16,7 @@ public class PositionGpsDto {
     private Long id;
     private double lat;
     private double lng;
+
     private String timestamp;
+
 }

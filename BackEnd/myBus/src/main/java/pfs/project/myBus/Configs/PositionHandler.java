@@ -15,34 +15,34 @@ public class PositionHandler extends TextWebSocketHandler {
 
     public PositionHandler(DriverService driverService) {
         this.driverService = driverService;
-        this.objectMapper = new ObjectMapper(); // pour convertir JSON -> DTO
+        this.objectMapper = new ObjectMapper(); // pour transformer json to dto
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        System.out.println("📩 Message reçu: " + payload);
+        System.out.println("Message recu: " + payload);
 
         try {
             PositionGpsDto positionDto = objectMapper.readValue(payload, PositionGpsDto.class);
-            Long driverId = 1L; // tu peux améliorer ça plus tard avec un vrai ID
+            Long driverId = 1L;
             driverService.updateDriverPosition(driverId, positionDto);
-            session.sendMessage(new TextMessage("✅ Position enregistrée."));
+            session.sendMessage(new TextMessage("Position enregistree"));
         } catch (Exception e) {
-            System.err.println("❌ Erreur traitement message: " + e.getMessage());
-            session.sendMessage(new TextMessage("❌ Erreur de traitement : " + e.getMessage()));
+            System.err.println(" Erreur traitement message: " + e.getMessage());
+            session.sendMessage(new TextMessage(" Erreur de traitement : " + e.getMessage()));
         }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("🔌 Connexion WebSocket fermée: " + session.getId());
+        System.out.println("Connexion WebSocket fermée: " + session.getId());
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String username = (String) session.getAttributes().get("username");
         String token = (String) session.getAttributes().get("token");
-        System.out.println("✅ Connexion WebSocket de : " + username + " avec token : " + token);
+        System.out.println(" Connexion WebSocket de : " + username + " avec token : " + token);
     }
 }
