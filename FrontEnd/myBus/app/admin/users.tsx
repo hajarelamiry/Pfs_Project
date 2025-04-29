@@ -1,24 +1,101 @@
 "use client"
 
-import { useState } from "react"
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native"
+import {useEffect, useState} from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, TouchableWithoutFeedback } from "react-native"
 import { Search, Filter, MoreVertical, Edit, Trash2, UserPlus, ChevronLeft, ChevronRight } from "lucide-react-native"
-
+import {useIsFocused} from "@react-navigation/core";
+import {router} from "expo-router";
+type Driver={
+  id:number,
+  firstName:string,
+  lastName:string,
+  email: string,
+  role: string,
+  phone:string
+}
 export default function UsersManagement() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [drivers,setDrivers]=useState([])
+  const isFocused = useIsFocused()
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigateToAddUser=()=>{router.push("/admin/Driver/AddUser")}
+  const handleEdit = (driver: Driver) => {
+    router.push(`/admin/Driver/Edit/${driver.id}`)
+  }
+  const handleDelete = async (id: number) => {
+    Alert.alert(
+        "Confirmer la suppression",
+        "Voulez-vous vraiment supprimer cet utilisateur ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Supprimer",
+            onPress: async () => {
+              try {
+                const res = await fetch(
+                    `http://100.89.162.239:8003/api/users/delete/${id}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        Authorization: "Basic " + btoa("admin:h200317"),
+                      },
+                    }
+                );
+                if (res.ok) {
+                  Alert.alert("Succes", "Utilisateur supprime");
+                  countFun();
+                } else {
+                  Alert.alert("Erreur", "echec hors de la suppression");
+                }
+              } catch (err) {
+                Alert.alert("Erreur", "Impossible de supprimer l'utilisateur");
+              }
+            },
+            style: "destructive",
+          },
+        ]
+    );
+  }
+  const countFun = async () => {
+    try {
+      const response = await fetch("http://100.89.162.239:8003/api/users/allUsers", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Basic " + btoa("admin:h200317"),
+        },
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      setDrivers(data)
+      setFilteredData(data)
+    } catch (err) {
+      console.error("Error", err)
+    }
+  }
+  useEffect(() => {
+    if (isFocused) {
+      countFun()
+    }
+  }, [isFocused])
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    const filtered = drivers.filter((driver: Driver) => {
+      const fullName = `${driver.firstName} ${driver.lastName}`.toLowerCase();
+      return fullName.includes(text.toLowerCase());
+    });
+    setFilteredData(filtered);
+  };
 
-  // Mock data for users
-  const users = [
-    { id: 1, name: "John Doe", email: "john.doe@example.com", role: "Admin", status: "Active" },
-    { id: 2, name: "Jane Smith", email: "jane.smith@example.com", role: "User", status: "Active" },
-    { id: 3, name: "Robert Johnson", email: "robert.j@example.com", role: "Driver", status: "Inactive" },
-    { id: 4, name: "Emily Davis", email: "emily.d@example.com", role: "User", status: "Active" },
-    { id: 5, name: "Michael Brown", email: "michael.b@example.com", role: "Admin", status: "Active" },
-    { id: 6, name: "Sarah Wilson", email: "sarah.w@example.com", role: "Driver", status: "Active" },
-  ]
-
+  const handleCloseMenu = () => {
+    setSelectedUserId(null);
+  };
   return (
-    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={handleCloseMenu}>
+          <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>User Management</Text>
         <Text style={styles.headerSubtitle}>Manage your system users</Text>
@@ -31,7 +108,7 @@ export default function UsersManagement() {
             style={styles.searchInput}
             placeholder="Search users..."
             value={searchQuery}
-            onChangeText={setSearchQuery}
+            onChangeText={handleSearch}
             placeholderTextColor="#64748B"
           />
         </View>
@@ -42,7 +119,7 @@ export default function UsersManagement() {
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={navigateToAddUser}>
             <UserPlus stroke="#FFFFFF" size={18} />
             <Text style={styles.addButtonText}>Add User</Text>
           </TouchableOpacity>
@@ -50,70 +127,56 @@ export default function UsersManagement() {
       </View>
 
       <View style={styles.tableHeader}>
-        <Text style={[styles.tableHeaderCell, { flex: 2 }]}>Name</Text>
-        <Text style={[styles.tableHeaderCell, { flex: 2 }]}>Email</Text>
+        <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Name</Text>
         <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Role</Text>
-        <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Status</Text>
+        <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Email</Text>
+        <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Phone</Text>
         <Text style={[styles.tableHeaderCell, { width: 50 }]}>Actions</Text>
       </View>
 
       <ScrollView style={styles.tableContainer}>
-        {users.map((user) => (
-          <View key={user.id} style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 2 }]}>{user.name}</Text>
-            <Text style={[styles.tableCell, { flex: 2 }]}>{user.email}</Text>
-            <Text style={[styles.tableCell, { flex: 1 }]}>{user.role}</Text>
-            <View
-              style={[styles.statusContainer, { backgroundColor: user.status === "Active" ? "#EFF6FF" : "#FEF2F2" }]}
-            >
-              <Text style={[styles.statusText, { color: user.status === "Active" ? "#1E40AF" : "#DC2626" }]}>
-                {user.status}
-              </Text>
-            </View>
+        {filteredData.length === 0 ? (
+                <Text style={{ textAlign: 'center', marginTop: 20, color: '#0465f3' }}>No Drivers Found.</Text>
+            ):
+            (filteredData.map((driver:Driver) => (
+          <View key={driver.id} style={styles.tableRow}>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{driver.firstName} {driver.lastName}</Text>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{driver.role}</Text>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{driver.email}</Text>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{driver.phone}</Text>
             <View style={[styles.tableCell, { width: 50, flexDirection: "row" }]}>
-              <TouchableOpacity style={styles.actionButton}>
+              <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => setSelectedUserId(driver.id)}>
                 <MoreVertical stroke="#64748B" size={18} />
               </TouchableOpacity>
+              {selectedUserId === driver.id && (
+                  <View style={styles.userActionSheet}>
+                    <TouchableOpacity style={styles.userActionButton} onPress={() => handleEdit(driver)}>
+                      <Edit stroke="#1E40AF" size={16} />
+                      <Text style={styles.userActionText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.userActionButton, styles.deleteButton]}
+                        onPress={() => handleDelete(driver.id)}
+                    >
+                      <Trash2 stroke="#DC2626" size={16} />
+                      <Text style={styles.deleteButtonText}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+              )}
             </View>
           </View>
-        ))}
+        )))}
       </ScrollView>
 
-      <View style={styles.paginationContainer}>
-        <TouchableOpacity style={styles.paginationButton}>
-          <ChevronLeft stroke="#1E40AF" size={20} />
-        </TouchableOpacity>
 
-        <View style={styles.paginationNumbers}>
-          <TouchableOpacity style={[styles.paginationNumber, styles.activePaginationNumber]}>
-            <Text style={styles.activePaginationNumberText}>1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.paginationNumber}>
-            <Text style={styles.paginationNumberText}>2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.paginationNumber}>
-            <Text style={styles.paginationNumberText}>3</Text>
-          </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity style={styles.paginationButton}>
-          <ChevronRight stroke="#1E40AF" size={20} />
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.userActionSheet}>
-        <TouchableOpacity style={styles.userActionButton}>
-          <Edit stroke="#1E40AF" size={16} />
-          <Text style={styles.userActionText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.userActionButton, styles.deleteButton]}>
-          <Trash2 stroke="#DC2626" size={16} />
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
     </View>
+      </TouchableWithoutFeedback>
   )
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -210,6 +273,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#F1F5F9",
+    position: "relative",
   },
   tableCell: {
     fontSize: 14,
@@ -266,7 +330,7 @@ const styles = StyleSheet.create({
   userActionSheet: {
     position: "absolute",
     right: 16,
-    top: 200,
+    top: 40,
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
     shadowColor: "#000",
@@ -276,7 +340,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     padding: 8,
     width: 120,
-    display: "none", // Hidden by default, would be shown on action button press
+    zIndex: 10,
   },
   userActionButton: {
     flexDirection: "row",

@@ -11,7 +11,7 @@ export default function Statistics() {
 
   const chartConfig = {
     backgroundGradientFrom: "#FFFFFF",
-    backgroundGradientTo: "#FFFFFF",
+    backgroundGradientTo: "#FFFFFF", 
     color: (opacity = 1) => `rgba(30, 64, 175, ${opacity})`,
     strokeWidth: 2,
     barPercentage: 0.5,
