@@ -1,6 +1,5 @@
 package pfs.project.myBus.Controller.Admin;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,10 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import pfs.project.myBus.Dto.BusDto;
 import pfs.project.myBus.Entity.Bus;
 import pfs.project.myBus.Entity.BusType;
-import pfs.project.myBus.Entity.Driver;
-import pfs.project.myBus.Repository.BusRepo;
 import pfs.project.myBus.Services.BusService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +33,6 @@ public class BusController {
         }
 
     }
-
     @GetMapping("/types")
     public List<BusType> getBusTypes() {
         return busService.getAllBusTypes();
@@ -48,10 +43,7 @@ public class BusController {
         return busService.getAllBuses();
     }
 
-    @GetMapping("/drivers")
-    public List<Driver> getDrivers() {
-        return busService.getAllDrivers();
-    }
+
     @DeleteMapping("/bus/{id}")
     public ResponseEntity<?> DeleteBuses(@PathVariable Long id){
         try{
@@ -70,7 +62,7 @@ public class BusController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Bus> updateBus(@PathVariable Long id, @RequestBody Bus bus) {
+    public ResponseEntity<Bus> updateBus(@PathVariable("id") Long id, @RequestBody Bus bus) {
         try {
             Bus updatedBus = busService.updateBus(id, bus);
             return ResponseEntity.ok(updatedBus);
@@ -78,4 +70,9 @@ public class BusController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+    @GetMapping("/count")
+    public Map<String, Long> getCounts() {
+        return busService.getCounts();
+    }
+
 }

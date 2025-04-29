@@ -9,7 +9,7 @@ public class Bus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int capacity;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "bus_type_id", nullable = true)
     private BusType busType;
     private boolean wifi;
