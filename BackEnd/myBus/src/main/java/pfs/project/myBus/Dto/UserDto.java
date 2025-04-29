@@ -1,9 +1,13 @@
 package pfs.project.myBus.Dto;
 
+import pfs.project.myBus.Enums.Role;
+
 public class DriverDto {
+    private String email;
     private String firstName;
     private String lastName;
-
+    private String phone;
+    private Role role;
     public String getFirstName() {
         return firstName;
     }

@@ -1,6 +1,4 @@
-
 "use client"
-
 import { useEffect, useState } from "react"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import {View, Text, TextInput, Button, Alert, ScrollView, TouchableOpacity, Switch, StyleSheet} from "react-native"
@@ -15,17 +13,15 @@ interface Statut {
     id: number;
     label: string;
 }
-
 type Driver = {
     id: string
     firstName: string
     lastName: string
 }
 
-export default function EditBus() {
+export default function EditBus({onCancel}: { onCancel?: () => void }) {
     const router = useRouter();
-    const navigateToBuses = () => router.push('../admin/buses');
-
+    const navigateToBuses = () => router.push('/admin/buses');
     const [formData, setFormData] = useState({
         busTypeId: "",
         driverId: "",
@@ -35,7 +31,6 @@ export default function EditBus() {
         security: false,
         statut:""
     })
-
     const [busTypes, setBusTypes] = useState<BusType[]>([])
     const [drivers, setDrivers] = useState<Driver[]>([])
     const [showBusTypeDropdown, setShowBusTypeDropdown] = useState(false)
@@ -83,7 +78,7 @@ export default function EditBus() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const driverRes = await fetch("http://100.89.162.136:8003/api/buses/drivers", {
+                const driverRes = await fetch("http://100.89.162.239:8003/api/drivers/getDrivers", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -91,7 +86,7 @@ export default function EditBus() {
                     },
                 });
 
-                const busTypeRes = await fetch("http://100.89.162.136:8003/api/buses/types", {
+                const busTypeRes = await fetch("http://100.89.162.239:8003/api/buses/types", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -129,7 +124,7 @@ export default function EditBus() {
 
     const fetchBusDetails = async () => {
         try {
-            const response = await axios.get(`http://100.89.162.136:8003/api/buses/getBus/${id}`, {
+            const response = await axios.get(`http://100.89.162.239:8003/api/buses/getBus/${id}`, {
                 headers: {
                     Authorization: "Basic " + btoa("admin:h200317"),
                 },
@@ -144,6 +139,7 @@ export default function EditBus() {
                 security: response.data.security || false,
                 statut: response.data.statut || "",
             });
+            if (onCancel) onCancel();
         } catch (error) {
             Alert.alert("Error", "Unable to load bus")
             console.error(error)
@@ -166,7 +162,7 @@ export default function EditBus() {
 
     const handleUpdate = async () => {
         try {
-            await axios.put(`http://100.89.162.136:8003/api/buses/update/${id}`, {
+            await axios.put(`http://100.89.162.239:8003/api/buses/update/${id}`, {
                 busTypeId: formData.busTypeId,
                 driverId: formData.driverId,
                 capacity: parseInt(formData.capacity),
@@ -227,11 +223,15 @@ export default function EditBus() {
                         <TouchableOpacity style={styles.dropdown} onPress={() => setShowDriverDropdown(!showDriverDropdown)}>
                             <View style={styles.dropdownSelection}>
                                 <Text style={styles.dropdownIcon}>👤</Text>
-                                <Text style={styles.dropdownText}  >
+                               $
+                                <Text style={styles.dropdownText}>
                                     {selectedDriver
                                         ? `${selectedDriver.firstName} ${selectedDriver.lastName}`
-                                        : `${bus.driver.firstName} ${bus.driver.lastName}`}
+                                        : bus.driver
+                                            ? `${bus.driver.firstName} ${bus.driver.lastName}`
+                                            : "no driver"}
                                 </Text>
+
                             </View>
                             <ChevronDown stroke="#64748B" size={18} />
                         </TouchableOpacity>

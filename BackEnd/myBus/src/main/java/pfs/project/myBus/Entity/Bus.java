@@ -1,22 +1,23 @@
 package pfs.project.myBus.Entity;
 
 import jakarta.persistence.*;
+import pfs.project.myBus.Dto.BusDto;
 
 @Entity
 public class Bus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private int capacity;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "bus_type_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "bus_type_id", nullable = true)
     private BusType busType;
     private boolean wifi;
     private boolean charging;
     private boolean security;
     private String statut;
     @OneToOne
-    @JoinColumn(name = "driver_id", referencedColumnName = "id")
+    @JoinColumn(name = "driver_id", referencedColumnName = "id",nullable = true)
     private Driver driver;
 
 
@@ -29,7 +30,7 @@ public class Bus {
         this.statut = statut;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -41,7 +42,7 @@ public class Bus {
         return driver;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -84,4 +85,6 @@ public class Bus {
     public void setSecurity(boolean security) {
         this.security = security;
     }
+
+
 }

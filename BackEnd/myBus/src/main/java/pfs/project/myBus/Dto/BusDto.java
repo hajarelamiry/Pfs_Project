@@ -2,8 +2,9 @@ package pfs.project.myBus.Dto;
 
 import lombok.Data;
 
-@Data
+
 public class BusDto {
+    private Long id;
     private int capacity;
     private String status;
     private boolean charging;
@@ -66,5 +67,13 @@ public class BusDto {
 
     public void setSecurity(boolean security) {
         this.security = security;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

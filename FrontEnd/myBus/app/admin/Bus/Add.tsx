@@ -14,7 +14,6 @@ interface Status {
     id: number;
     label: string;
 }
-
 type Driver = {
     id: string
     firstName: string
@@ -22,9 +21,8 @@ type Driver = {
 }
 
 export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
-
     const router = useRouter();
-
+    const [formKey, setFormKey] = useState(0);
     const navigateToBuses = () => router.push('/admin/buses');
     const [formData, setFormData] = useState({
         busTypeId: "",
@@ -35,7 +33,6 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         security: false,
         status:""
     })
-
     const [busTypes, setBusTypes] = useState<BusType[]>([])
     const [drivers, setDrivers] = useState<Driver[]>([])
     const [showBusTypeDropdown, setShowBusTypeDropdown] = useState(false)
@@ -53,7 +50,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const driverRes = await fetch("http://100.89.162.136:8003/api/buses/drivers", {
+                const driverRes = await fetch("http://100.89.162.239:8003/api/drivers/getDrivers", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -61,7 +58,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                     },
                 });
 
-                const busTypeRes = await fetch("http://100.89.162.136:8003/api/buses/types", {
+                const busTypeRes = await fetch("http://100.89.162.239:8003/api/buses/types", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -100,13 +97,11 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         setFormData((prev) => ({...prev, busTypeId: busType.id}))
         setShowBusTypeDropdown(false)
     }
-
     const selectDriver = (driver: Driver) => {
         setSelectedDriver(driver)
         setFormData((prev) => ({...prev, driverId: driver.id}))
         setShowDriverDropdown(false)
     }
-
     const selectStatus = (status: Status) => {
         console.log("Statut selectionne:", status);
         setSelectedStatus(status);
@@ -116,9 +111,8 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         }));
         setShowStatusDropdown(false);
     };
-
     const handleSubmit = async (message?: any) => {
-        if (!formData.busTypeId || !formData.driverId || !formData.capacity) {
+        if (!formData.busTypeId || !formData.capacity) {
             alert("Please fill out all required fields.");
             return;
         }
@@ -135,7 +129,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         console.log(payload);
 
         try {
-            const response = await fetch("http://100.89.162.136:8003/api/buses/add", {
+            const response = await fetch("http://100.89.162.239:8003/api/buses/add", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -146,7 +140,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
 
             if (response.ok) {
                 const savedBus = await response.json();
-                console.log("Bus registered successfully:", savedBus);
+                alert("Bus registered successfully");
                 setFormData({
                     capacity: "",
                     charging: false,
@@ -158,6 +152,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
 
                 });
                 setSelectedStatus(null);
+                setFormKey(prev => prev + 1);
                 if (onCancel) onCancel();
             } else {
                 const error = await response.text();
@@ -175,9 +170,8 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
             }
         }
     };
-
     return (
-        <View style={styles.container}>
+        <View style={styles.container} key={formKey}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Add Bus</Text>
                 <Text style={styles.headerSubtitle}>Enter bus details</Text>

@@ -1,10 +1,8 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native"
 import { Bus as BusIcon, Search, Filter, Plus, Battery, Wifi, Shield, Edit, Trash2 } from "lucide-react-native"
 import { useRouter } from "expo-router"
-
 type Bus = {
   id: number
   name?: string
@@ -29,11 +27,12 @@ type Bus = {
 }
 
 export default function BusesList() {
-  const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
-
   const router = useRouter()
   const [buses, setBuses] = useState<Bus[]>([])
+  const [busData, setBusData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchBuses()
@@ -42,7 +41,7 @@ export default function BusesList() {
   const fetchBuses = async () => {
     try {
       setLoading(true)
-      const response = await fetch("http://100.89.162.136:8003/api/buses/allBuses", {
+      const response = await fetch("http://100.89.162.239:8003/api/buses/allBuses", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -54,13 +53,17 @@ export default function BusesList() {
       }
       const data = await response.json()
       setBuses(data)
+      setBusData(data)
+      setFilteredData(data)
     } catch (err) {
       console.error("Error fetching buses", err)
     } finally {
       setLoading(false)
     }
   }
+
   const navigateToAdd = () => router.push("/admin/Bus/Add")
+  const navigateToAddBusType = () => router.push("/admin/Bus/BusType")
 
   const navigateToEdit = (busId: number) => {
     router.push(`/admin/Bus/Edit/${busId}`)
@@ -69,7 +72,7 @@ export default function BusesList() {
   const deleteBus = async (busId: number) => {
     try {
       setLoading(true)
-      const response = await fetch(`http://100.89.161.147:8003/api/buses/bus/${busId}`, {
+      const response = await fetch(`http://100.89.162.239:8003/api/buses/bus/${busId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -122,6 +125,13 @@ export default function BusesList() {
         return { bg: "#F3F4F6", text: "#6B7280" }
     }
   }
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    const filtered = busData.filter((bus:Bus) =>
+        bus?.busType?.name?.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredData(filtered);
+  };
 
   return (
       <View style={styles.container}>
@@ -137,7 +147,7 @@ export default function BusesList() {
                 style={styles.searchInput}
                 placeholder="Search buses..."
                 value={searchQuery}
-                onChangeText={setSearchQuery}
+                onChangeText={handleSearch}
                 placeholderTextColor="#64748B"
             />
           </View>
@@ -152,11 +162,18 @@ export default function BusesList() {
               <Plus stroke="#FFFFFF" size={18} />
               <Text style={styles.addButtonText}>Add Bus</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.addButton} onPress={navigateToAddBusType}>
+              <Plus stroke="#FFFFFF" size={18} />
+              <Text style={styles.addButtonText}>Add Bus Type</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
         <ScrollView style={styles.busesContainer}>
-          {buses.map((bus) => {
+          {filteredData.length === 0 ? (
+                  <Text style={{ textAlign: 'center', marginTop: 20, color: '#0465f3' }}>No Buses Found.</Text>
+              ):
+              (filteredData.map((bus:Bus) => {
             return (
                 <View key={bus.id} style={styles.busCard}>
                   <View style={styles.busCardHeader}>
@@ -174,7 +191,7 @@ export default function BusesList() {
                   </Text>
 
                   <Text style={styles.busRoute}>
-                    👤 {bus.driver.firstName} {bus.driver.lastName}
+                    👤 {bus.driver ? `${bus.driver.firstName} ${bus.driver.lastName}` : "No driver"}
                   </Text>
 
                   <View style={styles.divider} />
@@ -208,11 +225,12 @@ export default function BusesList() {
                   </View>
                 </View>
             )
-          })}
+          }))})
         </ScrollView>
       </View>
   )
 }
+
 
 
 const styles = StyleSheet.create({
