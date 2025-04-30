@@ -9,6 +9,7 @@ import pfs.project.myBus.Repository.PositionGpsRepository;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 public class DriverService {
@@ -27,7 +28,6 @@ public class DriverService {
         PositionGps position = driver.getPositionGps();
 
         if (position == null) {
-
             position = new PositionGps();
             position.setLat(positionDto.getLat());
             position.setLng(positionDto.getLng());
@@ -38,20 +38,23 @@ public class DriverService {
 
             positionGpsRepository.save(position);
             driver.setPositionGps(position);
-
         } else {
-
             position.setLat(positionDto.getLat());
             position.setLng(positionDto.getLng());
 
             OffsetDateTime offsetDateTime = OffsetDateTime.parse(positionDto.getTimestamp());
             LocalDateTime timestamp = offsetDateTime.toLocalDateTime();
             position.setTimestamp(timestamp);
-
         }
 
-
-
         driverRepository.save(driver);
+    }
+   public List<Driver> getAllDrivers() {
+        return driverRepository.findAll();
+    }
+
+
+    public List<Driver> getDrivers() {
+        return driverRepository.findUnassignedDrivers();
     }
 }
