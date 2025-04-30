@@ -1,26 +1,87 @@
-"use client"
-
-import { useState } from "react"
-import { View, StyleSheet, SafeAreaView, Text } from "react-native"
+import { useEffect, useRef, useState } from "react"
+import { View, StyleSheet, SafeAreaView, Text, Alert } from "react-native"
+import * as Location from "expo-location"
 import { MapPin } from "lucide-react-native"
 import StatusIndicator from "../../components/StatusIndicator"
 import StartTripButton from "../../components/StartTripButton"
-
 
 export type DriverStatus = "available" | "paused" | "on_trip"
 
 export default function DriverDashboard() {
   const [driverStatus, setDriverStatus] = useState<DriverStatus>("available")
   const [isTripActive, setIsTripActive] = useState(false)
+  const [positionId, setPositionId] = useState<number | null>(null)
+  const socketRef = useRef<WebSocket | null>(null)
+  const locationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const startSendingLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync()
+    if (status !== "granted") {
+      Alert.alert("Permission refusée", "La permission de localisation est requise.")
+      return
+    }
+
+    const location = await Location.getCurrentPositionAsync({})
+    sendLocationToServer(location.coords)
+
+    // envoyer toutes les 5 minutes
+    locationIntervalRef.current = setInterval(async () => {
+      const updatedLocation = await Location.getCurrentPositionAsync({})
+      sendLocationToServer(updatedLocation.coords)
+    }, 5 * 60 * 1000)
+  }
+
+  const stopSendingLocation = () => {
+    if (locationIntervalRef.current !== null) {
+      clearInterval(locationIntervalRef.current)
+      locationIntervalRef.current = null
+    }
+    if (socketRef.current) {
+      socketRef.current.close()
+      socketRef.current = null
+    }
+  }
+
+  const sendLocationToServer = (coords: Location.LocationObjectCoords) => {
+    const data = {
+      lat: coords.latitude,      
+      lng: coords.longitude,     
+      timestamp: new Date().toISOString()
+    }
+  
+
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(data))
+    }
+  }
+
+  const connectToWebSocket = () => {
+    socketRef.current = new WebSocket("ws://100.89.161.136:8003/ws/position?token=h200317&username=admin")
+
+    socketRef.current.onopen = () => {
+      console.log("Connexion WebSocket établie")
+    }
+
+    socketRef.current.onerror = (error) => {
+      console.log("Erreur WebSocket", error)
+    }
+
+    socketRef.current.onclose = () => {
+      console.log("Connexion WebSocket fermée")
+    }
+  }
 
   const handleStartTrip = () => {
     setIsTripActive(true)
     setDriverStatus("on_trip")
+    connectToWebSocket()
+    startSendingLocation()
   }
 
   const handleEndTrip = () => {
     setIsTripActive(false)
     setDriverStatus("available")
+    stopSendingLocation()
   }
 
   const toggleStatus = (newStatus: DriverStatus) => {
@@ -29,6 +90,12 @@ export default function DriverDashboard() {
     }
     setDriverStatus(newStatus)
   }
+
+  useEffect(() => {
+    return () => {
+      stopSendingLocation()
+    }
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>

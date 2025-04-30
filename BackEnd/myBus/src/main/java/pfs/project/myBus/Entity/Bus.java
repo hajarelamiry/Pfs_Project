@@ -20,6 +20,13 @@ public class Bus {
     @JoinColumn(name = "driver_id", referencedColumnName = "id",nullable = true)
     private Driver driver;
 
+    @ManyToMany
+    @JoinTable(
+            name = "bus_station",
+            joinColumns = @JoinColumn(name = "bus_id"),
+            inverseJoinColumns = @JoinColumn(name = "station_id")
+    )
+    private List<Station> stations;
 
 
     public String getStatut() {
@@ -84,6 +91,14 @@ public class Bus {
 
     public void setSecurity(boolean security) {
         this.security = security;
+    }
+  
+    public List<Station> getStations() {
+        return stations;
+    }
+
+    public void setStations(List<Station> stations) {
+        this.stations = stations;
     }
 
 

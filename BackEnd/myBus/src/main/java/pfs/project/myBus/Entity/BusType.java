@@ -1,9 +1,12 @@
 package pfs.project.myBus.Entity;
 
+import jakarta.persistence.*;
+import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 
 @Entity
 public class BusType {
@@ -13,6 +16,14 @@ public class BusType {
     private String name;
     private String firstStation;
     private String lastStation;
+
+    @ManyToMany
+    @JoinTable(
+            name = "bus_station",
+            joinColumns = @JoinColumn(name = "bus_id"),
+            inverseJoinColumns = @JoinColumn(name = "station_id")
+    )
+    private List<Station> stations;
 
     public Long getId() {
         return id;
