@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, SafeAreaView } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter, useLocalSearchParams } from "expo-router"
-import type { Bus, Station } from "../types/index"
+import type { Bus, Station } from "../types/idx"
 import { fetchBusDetails, fetchStationsByIds } from "../api/busService"
 import StationItem from "../../components/StationItem"
 

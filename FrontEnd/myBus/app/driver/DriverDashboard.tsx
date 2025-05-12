@@ -4,6 +4,8 @@ import * as Location from "expo-location"
 import { MapPin } from "lucide-react-native"
 import StatusIndicator from "../../components/StatusIndicator"
 import StartTripButton from "../../components/StartTripButton"
+import { API_URL } from "../../config"
+
 
 export type DriverStatus = "available" | "paused" | "on_trip"
 
@@ -28,7 +30,8 @@ export default function DriverDashboard() {
     locationIntervalRef.current = setInterval(async () => {
       const updatedLocation = await Location.getCurrentPositionAsync({})
       sendLocationToServer(updatedLocation.coords)
-    }, 5 * 60 * 1000)
+
+    }, 5 * 1000)
   }
 
   const stopSendingLocation = () => {
@@ -56,7 +59,8 @@ export default function DriverDashboard() {
   }
 
   const connectToWebSocket = () => {
-    socketRef.current = new WebSocket("ws://100.89.161.136:8003/ws/position?token=h200317&username=admin")
+    socketRef.current = new WebSocket(`${API_URL.replace('https', 'wss')}/ws/position?token=h200317&username=admin`)
+
 
     socketRef.current.onopen = () => {
       console.log("Connexion WebSocket établie")

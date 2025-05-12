@@ -14,7 +14,7 @@ import {
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
-import type { Bus, Station ,RootStackParamList } from "../types/index"
+import type { Bus, Station ,RootStackParamList } from "../types/idx"
 import { fetchBuses, fetchStations } from "../api/busService"
 import BusItem from "../../components/BusItem"
 import FilterTabs from "../../components/FilterTabs"
@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [stations, setStations] = useState<Station[]>([])
   const [filteredBuses, setFilteredBuses] = useState<Bus[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeFilter, setActiveFilter] = useState("bus") // 'bus' or 'station'
+  const [activeFilter, setActiveFilter] = useState("bus")
   const [isLoading, setIsLoading] = useState(true)
 
 
@@ -61,13 +61,13 @@ const Dashboard = () => {
     const query = searchQuery.toLowerCase()
 
     if (activeFilter === "bus") {
-      // Search by bus name
+      
       const filtered = buses.filter(
         (bus) => bus.name.toLowerCase().includes(query) || bus.number.toString().includes(query),
       )
       setFilteredBuses(filtered)
     } else {
-      // Search by station
+      
       const stationIds = stations
         .filter((station) => station.name.toLowerCase().includes(query))
         .map((station) => station.id)

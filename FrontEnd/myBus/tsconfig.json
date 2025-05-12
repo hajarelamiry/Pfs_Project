@@ -1,20 +1,15 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "moduleResolution": "node",  // Ajoute cette ligne
-    "esModuleInterop": true,      // Ajoute cette ligne
-    "allowSyntheticDefaultImports": true,  // Ajoute cette ligne
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+    "jsx": "react-native",
+    "types": [
+      "@types/react",
+      "react-native"
+    ]
   },
+  "extends": "expo/tsconfig.base",
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "nativewind-env.d.ts"
   ]
 }

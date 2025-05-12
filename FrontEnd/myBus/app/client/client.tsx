@@ -7,7 +7,7 @@ const Tab = createBottomTabNavigator();
 
 const TabsLayout = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator id={undefined}>
       <Tab.Screen name="Dashboard" component={Dashboard} />
       <Tab.Screen name="BusDetail" component={BusDetail} />
       <Tab.Screen name="MapView" component={MapScreen} />

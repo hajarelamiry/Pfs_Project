@@ -4,6 +4,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native"
 import { Users, Bus, TrendingUp } from "lucide-react-native"
 import QuickAccess from "../../components/QuickAcces"
 import { useIsFocused } from "@react-navigation/core"
+import { API_URL } from "../../config"
 
 type Counts = {
   busCount: number
@@ -17,7 +18,7 @@ export default function Dashboard() {
   useEffect(() => {
     const countFun = async () => {
       try {
-        const response = await fetch("http://100.89.162.239:8003/api/buses/count", {
+        const response = await fetch(`${API_URL}/api/buses/count`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

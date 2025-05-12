@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Marker } from "react-native-maps"
 import { Ionicons } from "@expo/vector-icons"
-import type { BusLocation } from "../app/types/index"
+import type { BusLocation } from "../app/types/idx"
 
 interface BusMarkerProps {
   location: BusLocation

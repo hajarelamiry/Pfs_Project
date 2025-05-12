@@ -4,6 +4,8 @@ import { useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native"
 import { ArrowLeft, User, Mail, Phone, Check, ChevronDown } from "lucide-react-native"
 import {router} from "expo-router";
+import React from "react";
+import { API_URL } from "../../../config";
 
 type Role = "ADMIN" | "DRIVER" | "CLIENT"
 
@@ -82,7 +84,7 @@ export default function AddUserForm({ onCancel }: { onCancel?: () => void }) {
             return
         }
         try {
-            const response = await fetch("http://100.89.162.239:8003/api/users/addUser", {
+            const response = await fetch(`${API_URL}/api/users/addUser`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

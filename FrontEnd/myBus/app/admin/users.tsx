@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert,
 import { Search, Filter, MoreVertical, Edit, Trash2, UserPlus, ChevronLeft, ChevronRight } from "lucide-react-native"
 import {useIsFocused} from "@react-navigation/core";
 import {router} from "expo-router";
+import { API_URL } from "../../config";
 type Driver={
   id:number,
   firstName:string,
@@ -34,7 +35,7 @@ export default function UsersManagement() {
             onPress: async () => {
               try {
                 const res = await fetch(
-                    `http://100.89.162.239:8003/api/users/delete/${id}`,
+                    `${API_URL}/api/users/delete/${id}`,
                     {
                       method: "DELETE",
                       headers: {
@@ -59,7 +60,7 @@ export default function UsersManagement() {
   }
   const countFun = async () => {
     try {
-      const response = await fetch("http://100.89.162.239:8003/api/users/allUsers", {
+      const response = await fetch(`${API_URL}/api/users/allUsers`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
