@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from "react-native"
 import { Bus as BusIcon, Search, Filter, Plus, Battery, Wifi, Shield, Edit, Trash2 } from "lucide-react-native"
 import { useRouter } from "expo-router"
+import {API_URL} from "../../config";
 type Bus = {
   id: number
   name?: string
@@ -41,7 +42,7 @@ export default function BusesList() {
   const fetchBuses = async () => {
     try {
       setLoading(true)
-      const response = await fetch("http://100.89.162.239:8003/api/buses/allBuses", {
+      const response = await fetch(`${API_URL}/api/buses/allBuses`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export default function BusesList() {
   const deleteBus = async (busId: number) => {
     try {
       setLoading(true)
-      const response = await fetch(`http://100.89.162.239:8003/api/buses/bus/${busId}`, {
+      const response = await fetch(`${API_URL}/api/buses/bus/${busId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -160,11 +161,11 @@ export default function BusesList() {
 
             <TouchableOpacity style={styles.addButton} onPress={navigateToAdd}>
               <Plus stroke="#FFFFFF" size={18} />
-              <Text style={styles.addButtonText}>Add Bus</Text>
+              <Text style={styles.addButtonText}>Bus</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.addButton} onPress={navigateToAddBusType}>
               <Plus stroke="#FFFFFF" size={18} />
-              <Text style={styles.addButtonText}>Add Bus Type</Text>
+              <Text style={styles.addButtonText}>BusType/Station</Text>
             </TouchableOpacity>
           </View>
         </View>

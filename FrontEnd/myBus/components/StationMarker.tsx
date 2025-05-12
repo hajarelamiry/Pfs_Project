@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Marker, Callout } from "react-native-maps"
-import type { Station } from "../app/types/index"
+import type { Station } from "../app/types/idx"
 
 interface StationMarkerProps {
   station: Station

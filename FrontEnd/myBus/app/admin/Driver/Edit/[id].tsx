@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import {ArrowLeft, Check, ChevronDown, Mail, Phone, User} from "lucide-react-native";
+import React from "react";
+import { API_URL } from "../../../../config";
 type Role = "ADMIN" | "DRIVER" | "CLIENT"
 type User = {
     firstName: string;
@@ -29,7 +31,7 @@ export default function EditUser() {
     useEffect(() => {
         const fetchDriver = async () => {
             try {
-                const res = await fetch(`http://100.89.162.239:8003/api/users/getUser/${id}`, {
+                const res = await fetch(`${API_URL}/api/users/getUser/${id}`, {
                     headers: {
                         Authorization: "Basic " + btoa("admin:h200317"),
                     },
@@ -52,7 +54,7 @@ export default function EditUser() {
 
     const handleSave = async () => {
         try {
-            const res = await fetch(`http://100.89.162.239:8003/api/users/update/${id}`, {
+            const res = await fetch(`${API_URL}/api/users/update/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

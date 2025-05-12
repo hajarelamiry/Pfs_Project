@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import type { Station } from "../app/types/index"
+import type { Station } from "../app/types/idx"
 
 interface StationItemProps {
   station: Station

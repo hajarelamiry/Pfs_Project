@@ -5,6 +5,7 @@ import {View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch,
 import {ArrowLeft, Bus, ChevronDown, Battery, Wifi, Shield, Check} from "lucide-react-native"
 import {AxiosError} from "axios";
 import {useRouter} from "expo-router";
+import {API_URL} from "../../../config"
 
 type BusType = {
     id: string
@@ -50,7 +51,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const driverRes = await fetch("http://100.89.162.239:8003/api/drivers/getDrivers", {
+                const driverRes = await fetch(`${API_URL}/api/drivers/getDrivers`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -58,7 +59,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
                     },
                 });
 
-                const busTypeRes = await fetch("http://100.89.162.239:8003/api/buses/types", {
+                const busTypeRes = await fetch(`${API_URL}/api/buses/types`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -129,7 +130,7 @@ export default function AddBusForm({onCancel}: { onCancel?: () => void }) {
         console.log(payload);
 
         try {
-            const response = await fetch("http://100.89.162.239:8003/api/buses/add", {
+            const response = await fetch(`${API_URL}/api/buses/add`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

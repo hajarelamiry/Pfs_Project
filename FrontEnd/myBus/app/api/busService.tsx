@@ -1,9 +1,6 @@
-import type { Bus, Station, BusLocation } from "../types/index"
+import type { Bus, Station, BusLocation } from "../types/idx"
 
-// Simulated API calls with mock data
-// In a real app, these would be actual API calls to your backend
 
-// Mock data for buses
 export const mockBuses: Bus[] = [
   {
     id: 1,
@@ -82,7 +79,7 @@ export const mockBuses: Bus[] = [
   },
 ]
 
-// Mock data for stations
+
 export const mockStations: Station[] = [
   { id: 1, name: "Gare Centrale", latitude: 48.8566, longitude: 2.3522, facilities: ["wheelchair", "wifi"] },
   { id: 2, name: "Opéra", latitude: 48.8604, longitude: 2.3315, facilities: ["wheelchair"] },
@@ -108,7 +105,7 @@ export const mockStations: Station[] = [
   { id: 22, name: "Bibliothèque", latitude: 48.8399, longitude: 2.3758, facilities: ["wheelchair", "wifi"] },
 ]
 
-// Mock data for bus locations
+
 export const mockBusLocations: BusLocation[] = [
   {
     busId: 1,
@@ -148,7 +145,7 @@ export const mockBusLocations: BusLocation[] = [
   },
 ]
 
-// Simulated API functions
+
 export const fetchBuses = async (): Promise<Bus[]> => {
   await new Promise((resolve) => setTimeout(resolve, 800))
   return mockBuses

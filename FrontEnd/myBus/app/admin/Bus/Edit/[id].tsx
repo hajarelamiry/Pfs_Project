@@ -4,6 +4,9 @@ import { useLocalSearchParams, useRouter } from "expo-router"
 import {View, Text, TextInput, Button, Alert, ScrollView, TouchableOpacity, Switch, StyleSheet} from "react-native"
 import axios from "axios"
 import {ArrowLeft, Battery, Bus, Check, ChevronDown, Shield, Wifi} from "lucide-react-native";
+import { API_URL }  from "../../../../config"
+
+
 
 type BusType = {
     id: string
@@ -78,7 +81,7 @@ export default function EditBus({onCancel}: { onCancel?: () => void }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const driverRes = await fetch("http://100.89.162.239:8003/api/drivers/getDrivers", {
+                const driverRes = await fetch(`${API_URL}/api/drivers/getDrivers`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -86,7 +89,7 @@ export default function EditBus({onCancel}: { onCancel?: () => void }) {
                     },
                 });
 
-                const busTypeRes = await fetch("http://100.89.162.239:8003/api/buses/types", {
+                const busTypeRes = await fetch(`${API_URL}/api/buses/types`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -124,7 +127,7 @@ export default function EditBus({onCancel}: { onCancel?: () => void }) {
 
     const fetchBusDetails = async () => {
         try {
-            const response = await axios.get(`http://100.89.162.239:8003/api/buses/getBus/${id}`, {
+            const response = await axios.get(`${API_URL}/api/buses/getBus/${id}`, {
                 headers: {
                     Authorization: "Basic " + btoa("admin:h200317"),
                 },
@@ -162,7 +165,7 @@ export default function EditBus({onCancel}: { onCancel?: () => void }) {
 
     const handleUpdate = async () => {
         try {
-            await axios.put(`http://100.89.162.239:8003/api/buses/update/${id}`, {
+            await axios.put(`${API_URL}/api/buses/update/${id}`, {
                 busTypeId: formData.busTypeId,
                 driverId: formData.driverId,
                 capacity: parseInt(formData.capacity),
