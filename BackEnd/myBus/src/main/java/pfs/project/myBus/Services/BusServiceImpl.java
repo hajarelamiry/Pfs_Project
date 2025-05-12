@@ -1,4 +1,5 @@
 package pfs.project.myBus.Services;
+
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import pfs.project.myBus.Dto.BusDto;
@@ -6,18 +7,17 @@ import pfs.project.myBus.Entity.Bus;
 import pfs.project.myBus.Entity.BusType;
 import pfs.project.myBus.Entity.Driver;
 import pfs.project.myBus.Repository.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 
 @Service
-public class BusServiceImpl implements BusService{
+public class BusServiceImpl implements BusService {
     private final BusRepo busRepository;
     private final DriverRepo driverRepository;
-    private final ClientRepo clientRepo;
     private final BusTypeRepo busTypeRepository;
+    private final ClientRepo clientRepo;
     private final UserRepo userRepo;
+
     public BusServiceImpl(BusRepo busRepository, DriverRepo driverRepository, ClientRepo clientRepo, BusTypeRepo busTypeRepository, UserRepo userRepo) {
         this.busRepository = busRepository;
         this.driverRepository = driverRepository;
@@ -25,9 +25,10 @@ public class BusServiceImpl implements BusService{
         this.busTypeRepository = busTypeRepository;
         this.userRepo = userRepo;
     }
+
     public Bus createBus(BusDto dto) {
         if (dto.getDriverId() != null && busRepository.existsByDriverId(dto.getDriverId())) {
-            throw new IllegalArgumentException("Ce chauffeur est deja assigne a un autre bus.");
+            throw new IllegalArgumentException("Ce chauffeur est déjà assigné à un autre bus.");
         }
 
         BusType busType = busTypeRepository.findById(dto.getBusTypeId())
@@ -54,10 +55,22 @@ public class BusServiceImpl implements BusService{
     public List<BusType> getAllBusTypes() {
         return busTypeRepository.findAll();
     }
-    public List<Bus> getAllBuses(){
 
+    public List<Driver> getAllDrivers() {
+        return driverRepository.findAll();
+    }
+
+    public List<Bus> getAllBuses() {
         return busRepository.findAll();
     }
+
+
+
+    @Override
+    public List<Bus> getBusesByStationName(String stationName) {
+        return busRepository.findByStations_NameContainingIgnoreCase(stationName);
+    }
+
     public void DeleteBus(Long id) {
         Optional<Bus> busOpt = busRepository.findById(id);
 
@@ -71,6 +84,7 @@ public class BusServiceImpl implements BusService{
             throw new EntityNotFoundException("Bus with ID " + id + " not found.");
         }
     }
+
     public boolean UpdateBud(Long id, BusDto busDto) {
         Optional<Bus> optionalBus = busRepository.findById(id);
         if (optionalBus.isPresent()) {
@@ -114,7 +128,7 @@ public class BusServiceImpl implements BusService{
             bus.setStatut(updatedBus.getStatut());
             bus.setWifi(updatedBus.isWifi());
             Driver driver = driverRepository.findById(updatedBus.getDriver().getId())
-                        .orElseThrow(() -> new RuntimeException("Driver not found"));
+                    .orElseThrow(() -> new RuntimeException("Driver not found"));
             bus.setDriver(driver);
             if (updatedBus.getBusType() != null) {
                 BusType busType = busTypeRepository.findById(updatedBus.getBusType().getId())
@@ -124,6 +138,7 @@ public class BusServiceImpl implements BusService{
             return busRepository.save(bus);
         }).orElseThrow(() -> new RuntimeException("Bus not found with ID: " + id));
     }
+
     public Map<String, Long> getCounts() {
         long busCount = busRepository.count();
         long driverCount = driverRepository.count();
@@ -134,8 +149,4 @@ public class BusServiceImpl implements BusService{
 
         return counts;
     }
-
-
-
 }
-

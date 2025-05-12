@@ -3,6 +3,8 @@ package pfs.project.myBus.Entity;
 import jakarta.persistence.*;
 import pfs.project.myBus.Dto.BusDto;
 
+import java.util.List;
+
 @Entity
 public class Bus {
     @Id
@@ -20,6 +22,13 @@ public class Bus {
     @JoinColumn(name = "driver_id", referencedColumnName = "id",nullable = true)
     private Driver driver;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "bus_station",
+            joinColumns = @JoinColumn(name = "bus_id"),
+            inverseJoinColumns = @JoinColumn(name = "station_id")
+    )
+    private List<Station> stations;
 
 
     public String getStatut() {
@@ -84,6 +93,14 @@ public class Bus {
 
     public void setSecurity(boolean security) {
         this.security = security;
+    }
+  
+    public List<Station> getStations() {
+        return stations;
+    }
+
+    public void setStations(List<Station> stations) {
+        this.stations = stations;
     }
 
 

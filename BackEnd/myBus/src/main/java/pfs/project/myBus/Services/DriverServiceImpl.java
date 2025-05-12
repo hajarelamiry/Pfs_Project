@@ -8,7 +8,7 @@ import pfs.project.myBus.Repository.DriverRepo;
 import java.util.List;
 
 @Service
-public class DriverServiceImpl implements DriverService {
+public class DriverServiceImpl {
 
     private final DriverRepo driverRepository;
     private final BusRepo busRepo;

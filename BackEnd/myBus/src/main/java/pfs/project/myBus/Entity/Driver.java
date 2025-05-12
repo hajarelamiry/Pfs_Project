@@ -12,6 +12,9 @@ public class Driver extends User{
     @OneToOne(mappedBy = "driver")
     @JsonIgnore
     private Bus bus;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "position_id", referencedColumnName = "id")
+    private PositionGps positionActuelle;
     public Driver(Long id, String firstName, String lastName, String email, Role role, String passwordHash, String phone) {
         super(id,firstName,lastName,email, role, passwordHash);
         this.phone = phone;
@@ -35,4 +38,13 @@ public class Driver extends User{
     public void setBus(Bus bus) {
         this.bus = bus;
     }
+  
+    public PositionGps getPositionGps() {
+        return positionActuelle;
+    }
+
+    public void setPositionGps(PositionGps positionActuelle) {
+        this.positionActuelle = positionActuelle;
+    }
+
 }
