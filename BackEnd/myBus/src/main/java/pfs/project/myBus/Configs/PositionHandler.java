@@ -25,7 +25,7 @@ public class PositionHandler extends TextWebSocketHandler {
 
         try {
             PositionGpsDto positionDto = objectMapper.readValue(payload, PositionGpsDto.class);
-            Long driverId = 1L;
+            Long driverId = 23L;
             driverService.updateDriverPosition(driverId, positionDto);
             session.sendMessage(new TextMessage("Position enregistree"));
         } catch (Exception e) {

@@ -18,7 +18,7 @@ public interface BusService {
     List<BusType> getAllBusTypes();
     List<Driver> getAllDrivers();
     List<Bus> getBusesByStationName(String StationName);
-    Bus getBusByName(String name);
+
     List<Bus> getAllBuses();
     void DeleteBus(Long id);
     Bus updateBus(Long id, Bus updatedBus);

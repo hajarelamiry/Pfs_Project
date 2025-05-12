@@ -1,4 +1,5 @@
 package pfs.project.myBus.Controller;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ import pfs.project.myBus.Services.BusService;
 
 import java.util.List;
 import java.util.Map;
+
+
 
 @RestController
 @RequestMapping("/api/buses")
@@ -49,5 +52,39 @@ public class BusController {
     @GetMapping("/drivers")
     public List<Driver> getDrivers() {
         return busService.getAllDrivers();
+    }
+
+
+
+
+    @DeleteMapping("/bus/{id}")
+    public ResponseEntity<?> DeleteBuses(@PathVariable Long id){
+        try{
+            busService.DeleteBus(id);
+            return ResponseEntity.ok(null);
+        }catch(EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getBus/{id}")
+    public ResponseEntity<?> getBusById(@PathVariable Long id) {
+        return busService.getBusById(id)
+                .map(bus -> ResponseEntity.ok().body(bus))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Bus> updateBus(@PathVariable("id") Long id, @RequestBody Bus bus) {
+        try {
+            Bus updatedBus = busService.updateBus(id, bus);
+            return ResponseEntity.ok(updatedBus);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+    @GetMapping("/count")
+    public Map<String, Long> getCounts() {
+        return busService.getCounts();
     }
 }

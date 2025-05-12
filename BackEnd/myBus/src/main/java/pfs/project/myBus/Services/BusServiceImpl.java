@@ -64,10 +64,7 @@ public class BusServiceImpl implements BusService {
         return busRepository.findAll();
     }
 
-    @Override
-    public Bus getBusByName(String name) {
-        return busRepository.findByName(name);
-    }
+
 
     @Override
     public List<Bus> getBusesByStationName(String stationName) {

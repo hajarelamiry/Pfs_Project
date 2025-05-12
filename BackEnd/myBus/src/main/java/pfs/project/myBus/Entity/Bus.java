@@ -3,6 +3,8 @@ package pfs.project.myBus.Entity;
 import jakarta.persistence.*;
 import pfs.project.myBus.Dto.BusDto;
 
+import java.util.List;
+
 @Entity
 public class Bus {
     @Id
@@ -20,7 +22,7 @@ public class Bus {
     @JoinColumn(name = "driver_id", referencedColumnName = "id",nullable = true)
     private Driver driver;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "bus_station",
             joinColumns = @JoinColumn(name = "bus_id"),

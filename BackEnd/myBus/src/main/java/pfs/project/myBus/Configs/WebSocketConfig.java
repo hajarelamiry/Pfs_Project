@@ -10,16 +10,18 @@ import org.springframework.context.annotation.Configuration;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final PositionHandler positionHandler;
+    private final AuthHandshakeInterceptor authInterceptor;
 
-    // ✅ Ce constructeur manquait
-    public WebSocketConfig(PositionHandler positionHandler) {
+    public WebSocketConfig(PositionHandler positionHandler, AuthHandshakeInterceptor authInterceptor) {
         this.positionHandler = positionHandler;
+        this.authInterceptor = authInterceptor;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry
                 .addHandler(positionHandler, "/ws/position")
+                .addInterceptors(authInterceptor)
                 .setAllowedOrigins("*"); // autorise toutes les origines
     }
 }
