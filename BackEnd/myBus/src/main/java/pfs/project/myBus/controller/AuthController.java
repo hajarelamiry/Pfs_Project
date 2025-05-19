@@ -1,9 +1,9 @@
-package pfs.project.myBus.controller;
+package pfs.project.myBus.Controller;
 
-import pfs.project.myBus.model.Client;
-import pfs.project.myBus.model.Driver;
-import pfs.project.myBus.model.LoginRequest;
-import pfs.project.myBus.service.UserService;
+import pfs.project.myBus.Entity.LoginRequest;
+import pfs.project.myBus.Entity.Client;
+import pfs.project.myBus.Entity.Driver;
+import pfs.project.myBus.Services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

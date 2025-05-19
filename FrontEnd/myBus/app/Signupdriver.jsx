@@ -12,7 +12,8 @@ const Signupdriver = () => {
   const [secureEntery, setSecureEntery] = useState(true); // Correct useState usage
 
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -26,7 +27,7 @@ const Signupdriver = () => {
     setErrorMessage("");
     setSuccessMessage("");
     
-    if (!email.trim() || !username.trim() || !password.trim() || !phoneNumber.trim()) {
+    if (!email.trim() || !password.trim() || !phoneNumber.trim() || !firstName.trim() || !lastName.trim()) {
       setErrorMessage('Error, Please fill in all the fields.');
       return;
     }
@@ -38,10 +39,11 @@ const Signupdriver = () => {
     }
     
     try {
-      const response = await axios.post('http://192.168.1.111:8081/api/auth/signup/driver', {
+      const response = await axios.post('http://172.20.10.2:8081/api/auth/signup/driver', {
         email,
-        username,
-        password,
+        firstName,
+        lastName,
+        passwordHash : password,
         phoneNumber,
       });
       console.log('Response:', response.data); // Debugging log
@@ -80,9 +82,19 @@ const Signupdriver = () => {
           <Ionicons name={"person"} size={30} color={Colors.auth.secondary} />
           <TextInput
             style={styles.textInput}
-            placeholder="UserName"
+            placeholder="First Name"
             placeholderTextColor={Colors.auth.secondary}
-            value={username} onChangeText={setUsername}
+            value={firstName} onChangeText={setFirstName}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name={"person-add-outline"} size={30} color={Colors.auth.secondary} />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Last Name"
+            placeholderTextColor={Colors.auth.secondary}
+            value={lastName} onChangeText={setLastName}
           />
         </View>
 

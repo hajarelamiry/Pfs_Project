@@ -12,7 +12,8 @@ const Signupclient = () => {
   const [secureEntery, setSecureEntery] = useState(true); // Correct useState usage
 
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -21,13 +22,14 @@ const Signupclient = () => {
   const handleSignup = async () => {
     console.log('Sign up button clicked');
     console.log('Email:', email);
-    console.log('Username:', username);
+    console.log('FirstName:', firstName);
+    console.log('LastName:', lastName);
     console.log('Password:', password);
 
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!email.trim() || !username.trim() || !password.trim()) {
+    if (!email.trim() || !firstName.trim()  || !lastName.trim() || !password.trim() || !lastName.trim()) {
       setErrorMessage("Please fill in all the fields.");
       return;
     }
@@ -39,10 +41,11 @@ const Signupclient = () => {
   
 
     try {
-      const response = await axios.post('http://192.168.1.111:8081/api/auth/signup/client', {
+      const response = await axios.post('http://172.20.10.2:8081/api/auth/signup/client', {
         email,
-        username,
-        password,
+        firstName,
+        lastName,
+        passwordHash: password,
       });
       console.log('Response:', response.data); // Debugging log
       setSuccessMessage("Signup Successful! Redirecting to login...");
@@ -81,9 +84,19 @@ const Signupclient = () => {
           <Ionicons name={"person"} size={30} color={Colors.auth.secondary} />
           <TextInput
             style={styles.textInput}
-            placeholder="UserName"
+            placeholder="First Name"
             placeholderTextColor={Colors.auth.secondary}
-            value={username} onChangeText={setUsername}
+            value={firstName} onChangeText={setFirstName}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name={"person-add-outline"} size={30} color={Colors.auth.secondary} />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Last Name"
+            placeholderTextColor={Colors.auth.secondary}
+            value={lastName} onChangeText={setLastName}
           />
         </View>
 
